@@ -4,12 +4,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
-import { gql } from "@/__generated__/gql";
 import { Character } from "@/__generated__/graphql";
 import { PaginatedTable } from "@/components/paginated-table";
 import { Button } from "@/components/ui/button";
-
-
+import { GET_CHARACTERS } from "@/lib/queries";
 
 export const Characters = () => {
   const { push } = useRouter();
