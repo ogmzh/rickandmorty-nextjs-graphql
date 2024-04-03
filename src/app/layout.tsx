@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
+import { Suspense } from "react";
+
 import { ApolloProvider } from "@/components/apollo-provider";
-import { cn } from "@/lib/utils";
+import { Header } from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 
 import "./globals.css";
-import { Header } from "../components/header";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -26,7 +30,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "bg-background font-sans antialiased overflow-hidden",
+          "overflow-hidden bg-background font-sans antialiased",
           fontSans.variable
         )}>
         <ThemeProvider
@@ -36,8 +40,20 @@ export default function RootLayout({
           disableTransitionOnChange>
           <Header />
           <main className="flex h-screen flex-col items-center justify-between p-24">
-            <ApolloProvider>{children}</ApolloProvider>
-            <div className="text-sm italic">Footer TM</div>
+            <Suspense fallback={<Spinner />}>
+              <ErrorBoundary
+                errorComponent={async (error) => {
+                  "use server";
+                  return (
+                    <div className="text-center text-xl text-destructive">
+                      Error fallback: {error.error.message}
+                    </div>
+                  );
+                }}>
+                <ApolloProvider>{children}</ApolloProvider>
+                <div className="text-sm italic">Footer TM</div>
+              </ErrorBoundary>
+            </Suspense>
           </main>
         </ThemeProvider>
       </body>
